@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
-const NotesSchema = new Schema({
+const mongoose = require('mongoose');//Creating data base
+const NotesSchema = new Schema({//Initializing schema
   title:{
       type:String,
     required:true
@@ -18,4 +17,4 @@ date:{
     default:Date.now
 },
 });
-module.export=mongoose.model('notemodel',NotesSchema);
+module.export=mongoose.model('notemodel',NotesSchema);//Converting to model
