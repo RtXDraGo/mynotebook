@@ -35,7 +35,7 @@ router.post('/addnote',getuser,[
     res.status(500).send("Some error occured");//if some other errors occures
    }
 })
-//update  notes  POST api/auth/updatenote login required
+//route 3 update  notes  Put api/notes/updatenote login required
 router.put('/updatenote/:id',getuser, async (req, res) => {
     const{title,description,tag}=req.body
     //create newnote object
@@ -52,5 +52,24 @@ router.put('/updatenote/:id',getuser, async (req, res) => {
     }
     note = await Notes.findByIdAndUpdate(req.params.id,{$set:newnote}, {new:true})
     res.json(note);
+})
+//route 4 update  notes  Put api/notes/deletenote login required
+router.delete('/deletenote/:id',getuser, async (req, res) => {
+    try {
+        
+    //find note and delete it
+     note=await Notes.findById(req.params.id)
+    if(!note){return res.status(401).send("not found")}
+    //allow deletion if user owns these note
+    if(note.user.toString()!==req.user.id){
+        return res.status(401).send("not allowed");
+    }
+    note = await Notes.findByIdAndDelete(req.params.id)
+    res.json("success:Note has been deleted")
+}
+catch (error) {
+    console.error(error.message);   
+    res.status(500).send("Some error occured");//if some other errors occures
+   }
 })
 module.exports = router
