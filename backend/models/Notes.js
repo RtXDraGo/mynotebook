@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');//Creating data base
+const { Schema } = mongoose;
 const NotesSchema = new Schema({//Initializing schema
+  user:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'user'
+  },
   title:{
       type:String,
     required:true
@@ -17,4 +22,4 @@ date:{
     default:Date.now
 },
 });
-module.export=mongoose.model('notemodel',NotesSchema);//Converting to model
+module.exports=mongoose.model('notes',NotesSchema);//Converting to model
