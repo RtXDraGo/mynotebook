@@ -8,10 +8,11 @@ var jwt = require('jsonwebtoken');
 const JWT_SECRET='Iamagoodboy'
 //Route1 create a user using /api/auth/createuser and check for validation no login required
 router.post('/createuser',[body('email').isEmail(),body('name','Enter a valid name').isLength({ min: 3 }),  body('password','Enter a valid password').isLength({ min: 5 })],async (req,res)=>{
+  let success=false;
     //If there are errors return those errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success,errors: errors.array() });
     }
     try {
         const salt=await bcrypt.genSalt(10);
@@ -20,7 +21,9 @@ router.post('/createuser',[body('email').isEmail(),body('name','Enter a valid na
         let user=await User.findOne({email:req.body.email});//search in User model for same email
         if(user)
         {
-          return res.status(400).json({error:"Emails should be unique"})
+
+          success=false;
+          return res.status(400).json({success,error:"Emails should be unique"})
         }
 
                 //if no errors initialize name,email,password save to database
@@ -35,7 +38,8 @@ router.post('/createuser',[body('email').isEmail(),body('name','Enter a valid na
           }
       }
       const jwdata=jwt.sign(data,JWT_SECRET);
-      res.json(jwdata)
+      success=true;
+      res.json({success,jwdata})
     } catch (error) {
      console.error(error.message);   
      res.status(500).send("Some error occured");//if some other errors occures
@@ -57,7 +61,8 @@ router.post('/login',[body('email','Enter a valid email').isEmail(),body('passwo
       const pass=await bcrypt.compare(password , user.password)
       if(!pass)
       {
-        return res.status(404).json({error:"please login with correct details"})        
+        success=false;
+        return res.status(404).json({success,error:"please login with correct details"})        
       }
       const data={
         user:{
@@ -65,7 +70,8 @@ router.post('/login',[body('email','Enter a valid email').isEmail(),body('passwo
         }
     }
     const jwdata=jwt.sign(data,JWT_SECRET);
-    res.json(jwdata)
+    success=true;
+    res.json({success,jwdata})
     } catch (error) {
       console.error(error.message);   
       res.status(500).send("Some error occured");//if some other errors occures
